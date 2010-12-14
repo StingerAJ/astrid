@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,11 +40,14 @@ import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -168,9 +172,14 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
     private Timer backgroundTimer;
     private final LinkedHashSet<SyncAction> syncActions = new LinkedHashSet<SyncAction>();
 
-
     private final TaskListContextMenuExtensionLoader contextMenuExtensionLoader = new TaskListContextMenuExtensionLoader();
     private VoiceInputAssistant voiceInputAssistant;
+    private boolean mMultiSelectMode = false;
+    private View mMultiSelectPanel;
+    private Button mDeleteButton;
+    private Button mCompleteButton;
+    private Button mTagButton;
+    private Button mMoveButton;
 
     /* ======================================================================
      * ======================================================= initialization
@@ -204,6 +213,13 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
         parent.addView(getListBody(parent), 1);
         setContentView(parent);
 
+        Bundle extras = getIntent().getExtras();
+        if(extras != null && extras.containsKey(TOKEN_FILTER)) {
+            filter = extras.getParcelable(TOKEN_FILTER);
+        } else {
+            filter = CoreFilterExposer.buildInboxFilter(getResources());
+        }
+
         if(database == null)
             return;
 
@@ -227,7 +243,7 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
 
         setUpTaskList();
         if(Constants.DEBUG)
-            setTitle("[D] " + filter.title); //$NON-NLS-1$
+            setTitle("[D] " + filter.title);
 
         contextMenuExtensionLoader.loadInNewThread(this);
     }
@@ -294,7 +310,37 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
                 Intent intent = new Intent(TaskListActivity.this,
                         FilterListActivity.class);
                 startActivity(intent);
-                AndroidUtilities.callApiMethod(5, TaskListActivity.this, "overridePendingTransition", //$NON-NLS-1$
+                AndroidUtilities.callApiMethod(5, TaskListActivity.this, "overridePendingTransition",
+                        new Class<?>[] { Integer.TYPE, Integer.TYPE },
+                        R.anim.slide_right_in, R.anim.slide_right_out);
+            }
+        });
+
+        mMultiSelectMode = false;
+        mMultiSelectPanel = findViewById(R.id.footer_multiselect);
+        mDeleteButton = (Button) findViewById(R.id.btn_multi_delete);
+        mCompleteButton = (Button) findViewById(R.id.btn_complete_uncomplete);
+        mTagButton = (Button) findViewById(R.id.btn_tag_untag);
+        mMoveButton = (Button) findViewById(R.id.btn_complete_uncomplete);
+
+        mDeleteButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            }
+        });
+        mCompleteButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            }
+        });
+        mTagButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            }
+        });
+        mMoveButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(TaskListActivity.this,
+                        FilterListActivity.class);
+                startActivity(intent);
+                AndroidUtilities.callApiMethod(5, TaskListActivity.this, "overridePendingTransition",
                         new Class<?>[] { Integer.TYPE, Integer.TYPE },
                         R.anim.slide_right_in, R.anim.slide_right_out);
             }
@@ -517,7 +563,7 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
                 SyncAction syncAction = extras.getParcelable(AstridApiConstants.EXTRAS_RESPONSE);
                 syncActions.add(syncAction);
             } catch (Exception e) {
-                exceptionService.reportError("receive-sync-action-" + //$NON-NLS-1$
+                exceptionService.reportError("receive-sync-action-" +
                         intent.getStringExtra(AstridApiConstants.EXTRAS_ADDON), e);
             }
         }
@@ -551,7 +597,7 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
                     taskAdapter.taskActionManager.addNew(taskId, addOn, action);
                 }
             } catch (Exception e) {
-                exceptionService.reportError("receive-detail-" + //$NON-NLS-1$
+                exceptionService.reportError("receive-detail-" +
                         intent.getStringExtra(AstridApiConstants.EXTRAS_ADDON), e);
             }
         }
@@ -907,7 +953,7 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
             return true;
         case MENU_HELP_ID:
             intent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://weloveastrid.com/help-user-guide-astrid-v3/active-tasks/")); //$NON-NLS-1$
+                    Uri.parse("http://weloveastrid.com/help-user-guide-astrid-v3/active-tasks/"));
             startActivity(intent);
             return true;
         case MENU_ADDON_INTENT_ID:
@@ -969,21 +1015,21 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
                     if(time == 0 || time == Long.MAX_VALUE)
                         return;
 
-                    Toast.makeText(TaskListActivity.this, "Scheduled Alarm: " + //$NON-NLS-1$
+                    Toast.makeText(TaskListActivity.this, "Scheduled Alarm: " +
                             new Date(time), Toast.LENGTH_LONG).show();
                     ReminderService.getInstance().setScheduler(null);
                 }
             });
             ReminderService.getInstance().scheduleAlarm(task);
             if(ReminderService.getInstance().getScheduler() != null)
-                Toast.makeText(this, "No alarms", Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+                Toast.makeText(this, "No alarms", Toast.LENGTH_LONG).show();
             ReminderService.getInstance().setScheduler(original);
             return true;
         }
 
         case CONTEXT_MENU_DEBUG + 1: {
             itemId = item.getGroupId();
-            new Notifications().showTaskNotification(itemId, 0, "test reminder"); //$NON-NLS-1$
+            new Notifications().showTaskNotification(itemId, 0, "test reminder");
             return true;
         }
 
@@ -1021,5 +1067,57 @@ public class TaskListActivity extends ListActivity implements OnScrollListener,
         }
 
         setUpTaskList();
+    }
+
+    /**
+     * Test selected tasks for showing appropriate labels
+     * @param selectedSet
+     * @param column_id
+     * @param defaultflag
+     * @return true when the specified flagged task is selected
+     */
+    private boolean testMultiple(Set<Long> selectedSet, int column_id, boolean defaultflag) {
+        Cursor c = taskAdapter.getCursor();
+        if (c == null || c.isClosed() || !(c instanceof TodorooCursor<?>)) {
+            return false;
+        }
+        TodorooCursor<?> cursor = (TodorooCursor<?>) c;
+        cursor.moveToPosition(-1);
+        while (cursor.moveToNext()) {
+            long id = (Long)cursor.get(Task.ID);
+            if (selectedSet.contains(Long.valueOf(id))) {
+                if (c.getInt(column_id) == (defaultflag? 1 : 0)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void updateMultiselectButtonNames () {
+        // Show "TAd_multiselectUndeleteTasks" when one or more deleted messages are selected.
+        if (testMultiple(taskAdapter.getSelectedSet(), Task.DELETION_DATE, true)) {
+            mDeleteButton.setText(R.string.TAd_multiselectUndeleteTasks);
+        } else {
+            mDeleteButton.setText(R.string.TAd_multiselectDeleteTasks);
+        }
+    }
+
+    /**
+     * Show or hide the panel of multi-select options
+     */
+    private void showMultiPanel(boolean show) {
+        if (show && mMultiSelectPanel.getVisibility() != View.VISIBLE) {
+            mMultiSelectPanel.setVisibility(View.VISIBLE);
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.multiselect_appear);
+            mMultiSelectPanel.startAnimation(animation);
+        } else if (!show && mMultiSelectPanel.getVisibility() != View.GONE) {
+            mMultiSelectPanel.setVisibility(View.GONE);
+            mMultiSelectPanel.startAnimation(
+                        AnimationUtils.loadAnimation(this, R.anim.multiselect_disappear));
+        }
+        if (show) {
+            updateFooterButtonNames();
+        }
     }
 }

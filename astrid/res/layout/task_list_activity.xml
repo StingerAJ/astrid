@@ -35,10 +35,68 @@
             android:paddingRight="50dip"
             android:ellipsize="start"
             style="@style/TextAppearance.TLA_Header"/>
+            
+        <!-- Multiselect Button -->
+        <ImageView android:id="@+id/multiselect"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:src="@drawable/tango_multiselect"
+            android:scaleType="center"
+            android:paddingLeft="5dip" 
+            android:paddingRight="5dip"/>         
 
     </LinearLayout>
     
     <!-- Body goes here -->
+    <android.gesture.GestureOverlayView android:id="@+id/gestures"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="100" 
+        
+        android:uncertainGestureColor="#00000000"
+        android:eventsInterceptionEnabled="true"
+        android:orientation="vertical">
+            
+        <!-- No Tasks label -->
+        <TextView android:id="@android:id/empty"
+            android:layout_width="fill_parent" 
+            android:layout_height="fill_parent"
+            android:visibility="gone"
+            android:text="@string/TLA_no_items"
+            style="@style/TextAppearance.TLA_NoItems"/>
+    
+        <!-- Task List -->
+        <ListView android:id="@android:id/list"
+            android:scrollbars="vertical"
+            android:cacheColorHint="#00000000"            
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"/>
+        
+		<!-- Multiselect-Panel -->
+		<LinearLayout android:id="@+id/footer_multiselect"
+			android:orientation="horizontal" android:visibility="gone"
+			android:layout_width="match_parent" android:layout_height="wrap_content"
+			android:paddingTop="5dip" android:paddingLeft="4dip"
+			android:paddingRight="4dip" android:paddingBottom="1dip"
+			android:background="@android:drawable/bottom_bar">
+			<Button android:id="@+id/btn_multi_select_all_none"
+				android:layout_width="0dip" android:layout_height="match_parent"
+				android:layout_weight="1" android:text="@string/TAd_multiselectAllTasks" />
+			<Button android:id="@+id/btn_multi_delete"
+				android:layout_width="0dip" android:layout_height="match_parent"
+				android:layout_weight="1" android:text="@string/TAd_multiselectDeleteTasks" />
+			<Button android:id="@+id/btn_complete_uncomplete" android:layout_width="0dip"
+				android:layout_height="match_parent" android:layout_weight="1"
+				android:text="@string/TAd_multiselectCompleteTasks" />
+			<Button android:id="@+id/btn_tag_untag" android:layout_width="0dip"
+				android:layout_height="match_parent" android:layout_weight="1"
+				android:text="@string/TAd_multiselectTagTasks" />
+			<Button android:id="@+id/btn_move" android:layout_width="0dip"
+				android:layout_height="match_parent" android:layout_weight="1"
+				android:text="@string/TAd_multiselectMoveTasks" />
+		</LinearLayout>
+    </android.gesture.GestureOverlayView>
         
     <!-- Footer -->
     <LinearLayout
@@ -84,6 +142,5 @@
             android:src="@drawable/tango_edit"
             android:scaleType="fitCenter"/> 
 
-    </LinearLayout>
-        
+    </LinearLayout>        
 </LinearLayout>

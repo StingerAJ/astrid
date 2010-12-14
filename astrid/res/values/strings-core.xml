@@ -123,6 +123,34 @@
   <!-- Context Item: purge task -->
   <string name="TAd_contextPurgeTask">Purge Task</string>
   
+  <!-- ============================================== MultiSelect-Popup == -->
+  <!-- Multiselect-Button: select all tasks -->
+  <string name="TAd_multiselectAllTasks">Select All</string>
+
+  <!-- Multiselect-Button: deselect all tasks -->
+  <string name="TAd_multiselectNoneTasks">Deselect All</string>
+
+  <!-- Multiselect-Button: delete tasks -->
+  <string name="TAd_multiselectDeleteTasks">Delete</string>
+
+  <!-- Multiselect-Button: undelete tasks -->
+  <string name="TAd_multiselectUndeleteTasks">Undelete</string>
+
+  <!-- Multiselect-Button: complete tasks -->
+  <string name="TAd_multiselectCompleteTasks">Complete</string>
+
+  <!-- Multiselect-Button: uncomplete tasks -->
+  <string name="TAd_multiselectUncompleteTasks">Uncomplete</string>
+
+  <!-- Multiselect-Button: tag tasks -->
+  <string name="TAd_multiselectTagTasks">Tag</string>
+
+  <!-- Multiselect-Button: untag tasks -->
+  <string name="TAd_multiselectUntagTasks">Untag</string>
+
+  <!-- Multiselect-Button: move tasks -->
+  <string name="TAd_multiselectMoveTasks">Move</string>
+
   <!-- ============================================== SortSelectionDialog == -->
   
   <!-- Sort Selection: dialog title -->    

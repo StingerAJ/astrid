@@ -30,7 +30,7 @@
             android:paddingLeft="5dip" 
             android:button="@drawable/btn_check"/>
             
-        <LinearLayout
+        <LinearLayout android:id="@+id/textContainer"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="100"
@@ -54,9 +54,17 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 style="@style/TextAppearance.TAd_ItemDetails"
-                android:visibility="gone" />
+                android:visibility="gone"/>
                 
         </LinearLayout>
+        
+        <!-- multiselect-checkbox  -->
+	    <ImageView
+	        android:id="@+id/selected"
+	        android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:paddingRight="5dip" 
+	        android:src="@drawable/btn_check_buttonless_dark_off" />
     </LinearLayout>
       
     <TextView android:id="@+id/extendedDetails"

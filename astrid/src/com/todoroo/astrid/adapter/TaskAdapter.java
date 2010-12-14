@@ -4,9 +4,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import android.app.ListActivity;
@@ -17,18 +19,18 @@ import android.database.Cursor;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
-import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.Html.ImageGetter;
 import android.text.Html.TagHandler;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.util.Linkify;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -120,6 +122,9 @@ public class TaskAdapter extends CursorAdapter implements Filterable {
     public final ExtendedDetailManager extendedDetailManager;
     public final DecorationManager decorationManager;
     public final TaskActionManager taskActionManager;
+
+    // selected tasks for multiselect
+    private final HashSet<Long> mChecked = new HashSet<Long>();
 
     /**
      * Constructor
@@ -869,6 +874,10 @@ public class TaskAdapter extends CursorAdapter implements Filterable {
 
         final CheckBox completeBox = ((CheckBox)container.findViewById(R.id.completeBox));
         completeBox.performClick();
+    }
+
+    public Set<Long> getSelectedSet() {
+        return mChecked;
     }
 
     /** Helper method to adjust a tasks' appearance if the task is completed or
